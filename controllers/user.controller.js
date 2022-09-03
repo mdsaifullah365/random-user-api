@@ -13,3 +13,13 @@ module.exports.getRandomUser = (req, res) => {
     });
   });
 };
+
+module.exports.getAllUser = (req, res) => {
+  fs.readFile('./data/user.json', (err, data) => {
+    res.status(200).send({
+      success: true,
+      message: 'Success',
+      data: JSON.parse(data),
+    });
+  });
+};
