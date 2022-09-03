@@ -42,6 +42,7 @@ module.exports.saveUser = async (req, res) => {
       missingProperties.push(property);
     }
   });
+
   if (missingProperties.length) {
     res.status(400).send({
       success: false,
@@ -71,6 +72,23 @@ module.exports.saveUser = async (req, res) => {
 
 module.exports.updateAUser = async (req, res) => {
   const newData = req.body;
+  const uid = newData.id;
+
+  if (!uid) {
+    res.status(400).send({
+      success: false,
+      message: `id is missing`,
+    });
+    return;
+  }
+
+  if (typeof uid !== 'string') {
+    res.status(400).send({
+      success: false,
+      message: `id must be a string`,
+    });
+    return;
+  }
 
   const readUserFile = new Promise((resolve, reject) => {
     fs.readFile('./data/user.json', (err, data) => {
@@ -82,8 +100,8 @@ module.exports.updateAUser = async (req, res) => {
   const data = await readUserFile;
   const users = JSON.parse(data);
 
-  const user = users.find((user) => user.id === newData.id);
-  const userIndex = users.findIndex((user) => user.id === newData.id);
+  const user = users.find((user) => user.id === uid);
+  const userIndex = users.findIndex((user) => user.id === uid);
 
   for (const key in newData) {
     user[key] = newData[key];
@@ -112,12 +130,42 @@ module.exports.updateUsers = async (req, res) => {
   const data = await readUserFile;
   const users = JSON.parse(data);
 
-  newData.forEach((data) => {
-    const user = users.find((user) => user.id === data.id);
-    const userIndex = users.findIndex((user) => user.id === data.id);
+  newData.forEach((u) => {
+    const uid = u.id;
 
-    for (const key in data) {
-      user[key] = data[key];
+    if (!uid) {
+      res.status(400).send({
+        success: false,
+        message: `id is missing`,
+      });
+      return;
+    }
+
+    if (typeof uid !== 'string') {
+      res.status(400).send({
+        success: false,
+        message: `id must be a string`,
+      });
+      return;
+    }
+  });
+
+  newData.forEach((u) => {
+    const uid = u.id;
+
+    const user = users.find((user) => user.id === uid);
+    const userIndex = users.findIndex((user) => user.id === uid);
+
+    if (!user) {
+      res.status(400).send({
+        success: false,
+        message: `User not found with id: ${uid}`,
+      });
+      return;
+    }
+
+    for (const key in u) {
+      user[key] = u[key];
     }
 
     users[userIndex] = user;
@@ -133,6 +181,22 @@ module.exports.updateUsers = async (req, res) => {
 
 module.exports.deleteUser = async (req, res) => {
   const id = req.body.id;
+
+  if (!id) {
+    res.status(400).send({
+      success: false,
+      message: `id is missing`,
+    });
+    return;
+  }
+
+  if (typeof id !== 'string') {
+    res.status(400).send({
+      success: false,
+      message: `id must be a string`,
+    });
+    return;
+  }
 
   const readUserFile = new Promise((resolve, reject) => {
     fs.readFile('./data/user.json', (err, data) => {
