@@ -36,7 +36,6 @@ module.exports.saveUser = async (req, res) => {
 
   const data = await readUserFile;
   const users = JSON.parse(data);
-  user.id = users.length + 1;
   users.push(user);
 
   fs.writeFile('./data/user.json', JSON.stringify(users), (err) => {
