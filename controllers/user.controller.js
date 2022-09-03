@@ -107,3 +107,28 @@ module.exports.updateUsers = async (req, res) => {
     });
   });
 };
+
+module.exports.deleteUser = async (req, res) => {
+  const id = req.body.id;
+
+  const readUserFile = new Promise((resolve, reject) => {
+    fs.readFile('./data/user.json', (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
+
+  const data = await readUserFile;
+  const users = JSON.parse(data);
+
+  const userIndex = users.findIndex((user) => user.id === id);
+
+  users.splice(userIndex, 1);
+
+  fs.writeFile('./data/user.json', JSON.stringify(users), (err) => {
+    res.status(200).send({
+      success: true,
+      message: 'User deleted successfully',
+    });
+  });
+};
