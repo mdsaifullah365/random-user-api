@@ -103,6 +103,14 @@ module.exports.updateAUser = async (req, res) => {
   const user = users.find((user) => user.id === uid);
   const userIndex = users.findIndex((user) => user.id === uid);
 
+  if (!user) {
+    res.status(400).send({
+      success: false,
+      message: `User not found with id: ${uid}`,
+    });
+    return;
+  }
+
   for (const key in newData) {
     user[key] = newData[key];
   }
