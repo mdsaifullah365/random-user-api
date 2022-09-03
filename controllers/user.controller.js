@@ -15,11 +15,19 @@ module.exports.getRandomUser = (req, res) => {
 };
 
 module.exports.getAllUser = (req, res) => {
+  const limit = req.query.limit;
+
   fs.readFile('./data/user.json', (err, data) => {
+    let users = JSON.parse(data);
+
+    if (limit) {
+      users = users.slice(0, Number(limit));
+    }
+
     res.status(200).send({
       success: true,
       message: 'Success',
-      data: JSON.parse(data),
+      data: users,
     });
   });
 };
