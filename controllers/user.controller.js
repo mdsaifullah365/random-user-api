@@ -180,9 +180,9 @@ module.exports.updateUsers = async (req, res) => {
 };
 
 module.exports.deleteUser = async (req, res) => {
-  const id = req.body.id;
+  const uid = req.body.id;
 
-  if (!id) {
+  if (!uid) {
     res.status(400).send({
       success: false,
       message: `id is missing`,
@@ -190,7 +190,7 @@ module.exports.deleteUser = async (req, res) => {
     return;
   }
 
-  if (typeof id !== 'string') {
+  if (typeof uid !== 'string') {
     res.status(400).send({
       success: false,
       message: `id must be a string`,
@@ -208,7 +208,15 @@ module.exports.deleteUser = async (req, res) => {
   const data = await readUserFile;
   const users = JSON.parse(data);
 
-  const userIndex = users.findIndex((user) => user.id === id);
+  const userIndex = users.findIndex((user) => user.id === uid);
+
+  if (userIndex === -1) {
+    res.status(400).send({
+      success: false,
+      message: `User not found with id: ${uid}`,
+    });
+    return;
+  }
 
   users.splice(userIndex, 1);
 
