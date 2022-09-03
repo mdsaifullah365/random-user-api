@@ -75,3 +75,35 @@ module.exports.updateAUser = async (req, res) => {
     });
   });
 };
+
+module.exports.updateUsers = async (req, res) => {
+  const newData = req.body;
+
+  const readUserFile = new Promise((resolve, reject) => {
+    fs.readFile('./data/user.json', (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
+
+  const data = await readUserFile;
+  const users = JSON.parse(data);
+
+  newData.forEach((data) => {
+    const user = users.find((user) => user.id === data.id);
+    const userIndex = users.findIndex((user) => user.id === data.id);
+
+    for (const key in data) {
+      user[key] = data[key];
+    }
+
+    users[userIndex] = user;
+  });
+
+  fs.writeFile('./data/user.json', JSON.stringify(users), (err) => {
+    res.status(200).send({
+      success: true,
+      message: 'Users updated successfully',
+    });
+  });
+};
