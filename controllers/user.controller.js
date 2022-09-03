@@ -35,6 +35,21 @@ module.exports.getAllUser = (req, res) => {
 module.exports.saveUser = async (req, res) => {
   const user = req.body;
 
+  const properties = ['id', 'name', 'gender', 'contact', 'address', 'photoURL'];
+  const missingProperties = [];
+  properties.forEach((property) => {
+    if (!user[property]) {
+      missingProperties.push(property);
+    }
+  });
+  if (missingProperties.length) {
+    res.status(400).send({
+      success: false,
+      message: `Missing properties: ${missingProperties.join(', ')}`,
+    });
+    return;
+  }
+
   const readUserFile = new Promise((resolve, reject) => {
     fs.readFile('./data/user.json', (err, data) => {
       if (err) reject(err);
